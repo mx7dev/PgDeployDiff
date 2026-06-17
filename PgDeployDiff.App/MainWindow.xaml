@@ -1,14 +1,191 @@
-﻿<Window x:Class="PgDeployDiff.App.MainWindow"
+<Window x:Class="PgDeployDiff.App.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:controls="clr-namespace:PgDeployDiff.App.Controls"
         Style="{StaticResource MaterialDesignWindow}"
-        Title="PgDeployDiff — Schema &amp; Data Compare"
-        Height="600" Width="900">
+        Title="PgDeployDiff — Schema Compare"
+        Height="780" Width="1100">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+        <!-- Estilo de TreeViewItem: sin highlight raro, fondo transparente -->
+        <Style TargetType="TreeViewItem">
+            <Setter Property="IsExpanded" Value="True"/>
+            <Setter Property="Padding" Value="2,3"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+        </Style>
+    </Window.Resources>
+
     <Grid>
-        <TextBlock Text="PgDeployDiff"
-                   Style="{StaticResource MaterialDesignHeadline3TextBlock}"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center" />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>   <!-- toolbar superior -->
+            <RowDefinition Height="*"/>      <!-- contenido principal -->
+            <RowDefinition Height="Auto"/>   <!-- status bar -->
+        </Grid.RowDefinitions>
+
+        <!-- ══════════════ TOOLBAR SUPERIOR ══════════════ -->
+        <Grid Grid.Row="0" Margin="12,10,12,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="12"/>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="16"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="16"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Combo ORIGEN -->
+            <Grid Grid.Column="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="6"/>
+                    <ColumnDefinition Width="36"/>
+                </Grid.ColumnDefinitions>
+                <ComboBox Grid.Column="0"
+                          ItemsSource="{Binding SavedConnections}"
+                          SelectedItem="{Binding SelectedSourceConnection}"
+                          DisplayMemberPath="DisplayName"
+                          Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                          materialDesign:HintAssist.Hint="Origen"/>
+                <Button Grid.Column="2" Content="..." Padding="0" Width="36"
+                        Style="{StaticResource MaterialDesignOutlinedButton}"
+                        ToolTip="Configurar conexión origen"
+                        Click="OnSourceBrowseClick"/>
+            </Grid>
+
+            <!-- Flecha -->
+            <TextBlock Grid.Column="1" Text="→" VerticalAlignment="Center"
+                       HorizontalAlignment="Center" FontSize="16"
+                       Foreground="{DynamicResource MaterialDesignBodyLight}"/>
+
+            <!-- Combo DESTINO -->
+            <Grid Grid.Column="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition Width="6"/>
+                    <ColumnDefinition Width="36"/>
+                </Grid.ColumnDefinitions>
+                <ComboBox Grid.Column="0"
+                          ItemsSource="{Binding SavedConnections}"
+                          SelectedItem="{Binding SelectedTargetConnection}"
+                          DisplayMemberPath="DisplayName"
+                          Style="{StaticResource MaterialDesignOutlinedComboBox}"
+                          materialDesign:HintAssist.Hint="Destino"/>
+                <Button Grid.Column="2" Content="..." Padding="0" Width="36"
+                        Style="{StaticResource MaterialDesignOutlinedButton}"
+                        ToolTip="Configurar conexión destino"
+                        Click="OnTargetBrowseClick"/>
+            </Grid>
+
+            <!-- Botón comparar -->
+            <Button Grid.Column="4"
+                    Content="COMPARAR"
+                    Command="{Binding CompareCommand}"
+                    Style="{StaticResource MaterialDesignRaisedButton}"/>
+
+            <!-- Spinner -->
+            <ProgressBar Grid.Column="6"
+                         IsIndeterminate="True"
+                         Width="100" VerticalAlignment="Center"
+                         Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}"/>
+        </Grid>
+
+        <!-- ══════════════ CONTENIDO PRINCIPAL ══════════════ -->
+        <Grid Grid.Row="1" Margin="12,0,12,0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="2*" MinHeight="80"/>
+                <RowDefinition Height="6"/>
+                <RowDefinition Height="3*" MinHeight="120"/>
+            </Grid.RowDefinitions>
+
+            <!-- TREEVIEW de resultados -->
+            <Border Grid.Row="0"
+                    BorderBrush="{DynamicResource MaterialDesignDivider}"
+                    BorderThickness="1">
+                <TreeView ItemsSource="{Binding DiffGroups}"
+                          SelectedItemChanged="OnTreeSelectedItemChanged"
+                          Background="Transparent"
+                          BorderThickness="0">
+
+                    <TreeView.ItemTemplate>
+                        <HierarchicalDataTemplate ItemsSource="{Binding Items}">
+
+                            <!-- Cabecera del grupo -->
+                            <StackPanel Orientation="Horizontal" Margin="2,2">
+                                <Border Width="10" Height="10" CornerRadius="2" Margin="0,0,8,0"
+                                        Background="{Binding GroupColor}" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding Header}"
+                                           FontWeight="SemiBold" FontSize="13"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+
+                            <!-- Ítems del grupo (ObjectDifference) -->
+                            <HierarchicalDataTemplate.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" Margin="2,1">
+                                        <TextBlock Text="{Binding TypeLabel}"
+                                                   FontSize="10" Width="40"
+                                                   Foreground="{DynamicResource MaterialDesignBodyLight}"
+                                                   VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding FullName}"
+                                                   FontSize="12" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </HierarchicalDataTemplate.ItemTemplate>
+
+                        </HierarchicalDataTemplate>
+                    </TreeView.ItemTemplate>
+                </TreeView>
+            </Border>
+
+            <!-- GridSplitter -->
+            <GridSplitter Grid.Row="1"
+                          HorizontalAlignment="Stretch"
+                          Height="6"
+                          Background="{DynamicResource MaterialDesignDivider}"
+                          Cursor="SizeNS"/>
+
+            <!-- PANELES DIFF -->
+            <Grid Grid.Row="2">
+                <!-- Placeholder cuando no hay selección -->
+                <TextBlock Text="← Seleccioná un objeto de la lista para ver el diff"
+                           Foreground="{DynamicResource MaterialDesignBodyLight}"
+                           HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock" BasedOn="{StaticResource MaterialDesignSubtitle2TextBlock}">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding SelectedDifference}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+                <!-- DiffViewer cuando hay selección -->
+                <controls:DiffViewer OldText="{Binding SelectedDifference.OldDefinition}"
+                                     NewText="{Binding SelectedDifference.NewDefinition}">
+                    <controls:DiffViewer.Style>
+                        <Style TargetType="controls:DiffViewer">
+                            <Setter Property="Visibility" Value="Visible"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding SelectedDifference}" Value="{x:Null}">
+                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </controls:DiffViewer.Style>
+                </controls:DiffViewer>
+            </Grid>
+        </Grid>
+
+        <!-- ══════════════ STATUS BAR ══════════════ -->
+        <TextBlock Grid.Row="2"
+                   Text="{Binding StatusMessage}"
+                   Style="{StaticResource MaterialDesignCaptionTextBlock}"
+                   Margin="12,4,12,6"/>
     </Grid>
 </Window>
