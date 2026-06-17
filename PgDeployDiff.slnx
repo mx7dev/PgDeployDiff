@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="PgDeployDiff.App/PgDeployDiff.App.csproj" />
+  <Project Path="PgDeployDiff.Core/PgDeployDiff.Core.csproj" />
+  <Project Path="PgDeployDiff.Data/PgDeployDiff.Data.csproj" />
+  <Project Path="PgDeployDiff.Tests/PgDeployDiff.Tests.csproj" />
+</Solution>
