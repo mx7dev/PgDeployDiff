@@ -8,6 +8,8 @@ namespace PgDeployDiff.App.Controls;
 
 public partial class DiffViewer : UserControl
 {
+    private bool _syncingScroll;
+
     public static readonly DependencyProperty OldTextProperty =
         DependencyProperty.Register(nameof(OldText), typeof(string), typeof(DiffViewer),
             new PropertyMetadata(string.Empty, OnTextChanged));
@@ -42,14 +44,33 @@ public partial class DiffViewer : UserControl
     private void UpdateDiff()
     {
         var diff = SideBySideDiffBuilder.Diff(OldText ?? string.Empty, NewText ?? string.Empty);
-        OldLines.ItemsSource = diff.OldText.Lines.Select(l => new DiffLine(l.Text, l.Type)).ToList();
-        NewLines.ItemsSource = diff.NewText.Lines.Select(l => new DiffLine(l.Text, l.Type)).ToList();
+        OldLines.ItemsSource = diff.OldText.Lines.Select(l => new DiffLine(l.Text, l.Type, l.Position)).ToList();
+        NewLines.ItemsSource = diff.NewText.Lines.Select(l => new DiffLine(l.Text, l.Type, l.Position)).ToList();
+    }
+
+    private void OnOldScrollChanged(object sender, ScrollChangedEventArgs e)
+    {
+        if (_syncingScroll) return;
+        _syncingScroll = true;
+        NewScroll.ScrollToVerticalOffset(e.VerticalOffset);
+        NewScroll.ScrollToHorizontalOffset(e.HorizontalOffset);
+        _syncingScroll = false;
+    }
+
+    private void OnNewScrollChanged(object sender, ScrollChangedEventArgs e)
+    {
+        if (_syncingScroll) return;
+        _syncingScroll = true;
+        OldScroll.ScrollToVerticalOffset(e.VerticalOffset);
+        OldScroll.ScrollToHorizontalOffset(e.HorizontalOffset);
+        _syncingScroll = false;
     }
 }
 
-public record DiffLine(string? Text, ChangeType Type)
+public record DiffLine(string? Text, ChangeType Type, int? LineNumber)
 {
     public string DisplayText => Text ?? string.Empty;
+    public string LineNumberText => LineNumber.HasValue ? LineNumber.Value.ToString() : string.Empty;
 
     public Brush Background => Type switch
     {

@@ -17,16 +17,30 @@
                        Foreground="#C62828"
                        Margin="4,0,0,2"/>
             <Border BorderBrush="#C62828" BorderThickness="1">
-                <ScrollViewer HorizontalScrollBarVisibility="Auto"
-                              VerticalScrollBarVisibility="Auto">
+                <ScrollViewer x:Name="OldScroll"
+                              HorizontalScrollBarVisibility="Auto"
+                              VerticalScrollBarVisibility="Auto"
+                              ScrollChanged="OnOldScrollChanged">
                     <ItemsControl x:Name="OldLines">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Background="{Binding Background}" Padding="6,1">
-                                    <TextBlock Text="{Binding DisplayText}"
-                                               FontFamily="Consolas" FontSize="11"
-                                               TextWrapping="NoWrap"/>
-                                </Border>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="40"/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border Grid.Column="0" Background="#EEEEEE" Padding="4,1">
+                                        <TextBlock Text="{Binding LineNumberText}"
+                                                   FontFamily="Consolas" FontSize="11"
+                                                   Foreground="#888888"
+                                                   HorizontalAlignment="Right"/>
+                                    </Border>
+                                    <Border Grid.Column="1" Background="{Binding Background}" Padding="6,1">
+                                        <TextBlock Text="{Binding DisplayText}"
+                                                   FontFamily="Consolas" FontSize="11"
+                                                   TextWrapping="NoWrap"/>
+                                    </Border>
+                                </Grid>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
@@ -46,16 +60,30 @@
                        Foreground="#2E7D32"
                        Margin="4,0,0,2"/>
             <Border BorderBrush="#2E7D32" BorderThickness="1">
-                <ScrollViewer HorizontalScrollBarVisibility="Auto"
-                              VerticalScrollBarVisibility="Auto">
+                <ScrollViewer x:Name="NewScroll"
+                              HorizontalScrollBarVisibility="Auto"
+                              VerticalScrollBarVisibility="Auto"
+                              ScrollChanged="OnNewScrollChanged">
                     <ItemsControl x:Name="NewLines">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Background="{Binding Background}" Padding="6,1">
-                                    <TextBlock Text="{Binding DisplayText}"
-                                               FontFamily="Consolas" FontSize="11"
-                                               TextWrapping="NoWrap"/>
-                                </Border>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="40"/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <Border Grid.Column="0" Background="#EEEEEE" Padding="4,1">
+                                        <TextBlock Text="{Binding LineNumberText}"
+                                                   FontFamily="Consolas" FontSize="11"
+                                                   Foreground="#888888"
+                                                   HorizontalAlignment="Right"/>
+                                    </Border>
+                                    <Border Grid.Column="1" Background="{Binding Background}" Padding="6,1">
+                                        <TextBlock Text="{Binding DisplayText}"
+                                                   FontFamily="Consolas" FontSize="11"
+                                                   TextWrapping="NoWrap"/>
+                                    </Border>
+                                </Grid>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>

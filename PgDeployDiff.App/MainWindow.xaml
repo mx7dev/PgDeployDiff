@@ -149,8 +149,13 @@
 
             <!-- PANELES DIFF -->
             <Grid Grid.Row="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
                 <!-- Placeholder cuando no hay selección -->
-                <TextBlock Text="← Seleccioná un objeto de la lista para ver el diff"
+                <TextBlock Grid.Row="0" Text="← Seleccioná un objeto de la lista para ver el diff"
                            Foreground="{DynamicResource MaterialDesignBodyLight}"
                            HorizontalAlignment="Center" VerticalAlignment="Center">
                     <TextBlock.Style>
@@ -166,7 +171,8 @@
                 </TextBlock>
 
                 <!-- DiffViewer cuando hay selección -->
-                <controls:DiffViewer OldText="{Binding SelectedDifference.OldDefinition}"
+                <controls:DiffViewer Grid.Row="0"
+                                     OldText="{Binding SelectedDifference.OldDefinition}"
                                      NewText="{Binding SelectedDifference.NewDefinition}">
                     <controls:DiffViewer.Style>
                         <Style TargetType="controls:DiffViewer">
@@ -179,6 +185,26 @@
                         </Style>
                     </controls:DiffViewer.Style>
                 </controls:DiffViewer>
+
+                <!-- Leyenda de colores -->
+                <Border Grid.Row="1"
+                        BorderBrush="{DynamicResource MaterialDesignDivider}"
+                        BorderThickness="0,1,0,0"
+                        Padding="8,5">
+                    <StackPanel Orientation="Horizontal">
+                        <Rectangle Width="14" Height="14" Fill="#FFCDD2" Stroke="#E57373" StrokeThickness="1" RadiusX="2" RadiusY="2" Margin="0,0,5,0"/>
+                        <TextBlock Text="Eliminado" FontSize="13" FontWeight="SemiBold" Margin="0,0,16,0" VerticalAlignment="Center"/>
+
+                        <Rectangle Width="14" Height="14" Fill="#C8E6C9" Stroke="#81C784" StrokeThickness="1" RadiusX="2" RadiusY="2" Margin="0,0,5,0"/>
+                        <TextBlock Text="Agregado" FontSize="13" FontWeight="SemiBold" Margin="0,0,16,0" VerticalAlignment="Center"/>
+
+                        <Rectangle Width="14" Height="14" Fill="#FFF9C4" Stroke="#FFD54F" StrokeThickness="1" RadiusX="2" RadiusY="2" Margin="0,0,5,0"/>
+                        <TextBlock Text="Modificado" FontSize="13" FontWeight="SemiBold" Margin="0,0,16,0" VerticalAlignment="Center"/>
+
+                        <Rectangle Width="14" Height="14" Fill="#FAFAFA" Stroke="#BDBDBD" StrokeThickness="1" RadiusX="2" RadiusY="2" Margin="0,0,5,0"/>
+                        <TextBlock Text="Sin correspondencia" FontSize="13" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
             </Grid>
         </Grid>
 
