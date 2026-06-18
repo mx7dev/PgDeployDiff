@@ -36,8 +36,12 @@ compares their schemas and data, and generates the deployment package for you:
 > This project is currently under active development.
 
 - [x] Project structure and architecture
-- [ ] Database connection UI
-- [ ] Schema comparison (tables, columns, indexes, constraints)
+- [x] Database connection UI — modal dialog with server/port/database/user/password, saved connection profiles
+- [x] Schema comparison — tables and views (columns, types, nullability, defaults, view definitions)
+- [x] Side-by-side diff viewer with line-level highlighting, line numbers and synchronized scroll
+- [x] TreeView results grouped by Modified / Added / Removed (Visual Studio Schema Compare style)
+- [x] DDL script generation — CREATE TABLE and CREATE OR REPLACE VIEW for all diff cases
+- [ ] Schema comparison — indexes, constraints, sequences, functions
 - [ ] Data comparison
 - [ ] Forward script generation
 - [ ] Rollback script generation
